@@ -8,6 +8,13 @@ plain='\033[0m'
 cur_dir=$(pwd)
 
 #############################################
+# Repository
+#############################################
+# Repo to pull releases from. Override with the SUI_REPO env var,
+# e.g. SUI_REPO=alireza0/s-ui bash <(curl -Ls .../install.sh)
+SUI_REPO="${SUI_REPO:-framecy/s-ui}"
+
+#############################################
 # Localization
 #
 # The installer speaks the six languages of the panel UI:
@@ -418,20 +425,20 @@ install_s-ui() {
     cd /tmp/
 
     if [ $# == 0 ]; then
-        last_version=$(curl -Ls "https://api.github.com/repos/alireza0/s-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+        last_version=$(curl -Ls "https://api.github.com/repos/${SUI_REPO}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
         if [[ ! -n "$last_version" ]]; then
             echo -e "${red}$(t fetch_fail)${plain}"
             exit 1
         fi
         printf "${green}$(t got_version)${plain}\n" "${last_version}"
-        wget -N --no-check-certificate -O /tmp/s-ui-linux-$(arch).tar.gz https://github.com/alireza0/s-ui/releases/download/${last_version}/s-ui-linux-$(arch).tar.gz
+        wget -N --no-check-certificate -O /tmp/s-ui-linux-$(arch).tar.gz https://github.com/${SUI_REPO}/releases/download/${last_version}/s-ui-linux-$(arch).tar.gz
         if [[ $? -ne 0 ]]; then
             echo -e "${red}$(t download_fail)${plain}"
             exit 1
         fi
     else
         last_version=$1
-        url="https://github.com/alireza0/s-ui/releases/download/${last_version}/s-ui-linux-$(arch).tar.gz"
+        url="https://github.com/${SUI_REPO}/releases/download/${last_version}/s-ui-linux-$(arch).tar.gz"
         printf "$(t begin_install)\n" "$1"
         wget -N --no-check-certificate -O /tmp/s-ui-linux-$(arch).tar.gz ${url}
         if [[ $? -ne 0 ]]; then
